@@ -23,7 +23,7 @@ function M.get_remote_url_for_origin(origin)
 		return
 	end
 
-	return result.job:result()
+	return result.job:result()[1]
 end
 
 function M.get_commit_hash_for_file(file)
@@ -33,7 +33,7 @@ function M.get_commit_hash_for_file(file)
 		return
 	end
 
-	return result.job:result()
+	return result.job:result()[1]
 end
 
 return M

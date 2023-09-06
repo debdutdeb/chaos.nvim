@@ -15,7 +15,7 @@ local function tbl_slice(tbl, first, last)
 end
 
 function M.run_system_command_blocking(cmd)
-	local payload = {}
+	local payload = { code = -1 }
 
 	Job:new({
 		command = cmd[1],
