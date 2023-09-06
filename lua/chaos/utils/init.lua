@@ -9,7 +9,7 @@ local M = {}
 local function tbl_slice(tbl, first, last)
 	local sliced = {}
 	for i = first or 1, last or #tbl do
-		slice[#sliced + 1] = tbl[i]
+		sliced[#sliced + 1] = tbl[i]
 	end
 	return sliced
 end
