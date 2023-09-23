@@ -1,6 +1,13 @@
+local lspconfig = require("lspconfig")
 local lspconfig_configs = require("lspconfig.configs")
 local lspconfig_util = require("lspconfig.util")
 local plenary_filetype = require("plenary.filetype")
+
+local function _start_and_autostart_from_now_on(config) -- this lets me gotoDefinition and still have lsp running on other modules
+	vim.lsp.start(config)
+	config.autostart = true
+	lspconfig[config.name].setup(config) -- resetup
+end
 
 local function __maybe_start_lsp(lsp_servers_configured, args)
 	-- TODO this probably can be simplified couple folds given lsp.start exists
@@ -33,7 +40,8 @@ local function __maybe_start_lsp(lsp_servers_configured, args)
 	end
 	-- try to find the trigger files in current and parents before lsp root
 	if lspconfig_util.root_pattern(unpack(autostart_patterns))(args.match or args.file) ~= nil then
-		return config.launch(args.buf)
+		-- return config.launch(args.buf)
+		return _start_and_autostart_from_now_on(config)
 	end
 	coroutine.resume(coroutine.create(function()
 		local root_dir
@@ -59,7 +67,7 @@ local function __maybe_start_lsp(lsp_servers_configured, args)
 
 		if #vim.fs.find(autostart_patterns, { upward = false, limit = 1, type = "file", path = root_dir }) ~= 0 then
 			-- config.launch(args.buf)
-			vim.lsp.start(config)
+			_start_and_autostart_from_now_on(config)
 		end
 	end))
 end
