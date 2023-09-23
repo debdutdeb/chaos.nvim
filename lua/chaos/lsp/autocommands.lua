@@ -4,7 +4,7 @@ local lspconfig_util = require("lspconfig.util")
 local plenary_filetype = require("plenary.filetype")
 
 local function _start_and_autostart_from_now_on(config) -- this lets me gotoDefinition and still have lsp running on other modules
-	vim.lsp.start(config)
+	-- vim.lsp.start(config)
 	config.autostart = true
 	lspconfig[config.name].setup(config) -- resetup
 end
@@ -35,7 +35,7 @@ local function __maybe_start_lsp(lsp_servers_configured, args)
 		end
 	end
 	local config = lspconfig_configs[get_configured_server()]
-	if not config then
+	if not config or config.autostart then
 		return
 	end
 	-- try to find the trigger files in current and parents before lsp root
