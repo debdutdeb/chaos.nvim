@@ -3,13 +3,16 @@ local lspconfig_configs = require("lspconfig.configs")
 local lspconfig_util = require("lspconfig.util")
 local plenary_filetype = require("plenary.filetype")
 
-local function _start_and_autostart_from_now_on(config) -- this lets me gotoDefinition and still have lsp running on other modules
+local function _start_and_autostart_from_now_on(config, config_fn) -- this lets me gotoDefinition and still have lsp running on other modules
 	-- vim.lsp.start(config)
-	config.autostart = true
+	if config_fn ~= nil then
+		config = vim.tbl_deep_extend("force", config, config_fn(config.name))
+	end
+	config.autostart = true -- force
 	lspconfig[config.name].setup(config) -- resetup
 end
 
-local function __maybe_start_lsp(lsp_servers_configured, args)
+local function __maybe_start_lsp(lsp_servers_configured, config_fn, args)
 	-- TODO this probably can be simplified couple folds given lsp.start exists
 	local autostart_patterns = {
 		"neovim_autostart_lsp",
@@ -41,7 +44,7 @@ local function __maybe_start_lsp(lsp_servers_configured, args)
 	-- try to find the trigger files in current and parents before lsp root
 	if lspconfig_util.root_pattern(unpack(autostart_patterns))(args.match or args.file) ~= nil then
 		-- return config.launch(args.buf)
-		return _start_and_autostart_from_now_on(config)
+		return _start_and_autostart_from_now_on(config, config_fn)
 	end
 	coroutine.resume(coroutine.create(function()
 		local root_dir
@@ -67,17 +70,17 @@ local function __maybe_start_lsp(lsp_servers_configured, args)
 
 		if #vim.fs.find(autostart_patterns, { upward = false, limit = 1, type = "file", path = root_dir }) ~= 0 then
 			-- config.launch(args.buf)
-			_start_and_autostart_from_now_on(config)
+			_start_and_autostart_from_now_on(config, config_fn)
 		end
 	end))
 end
 
 return {
-	_create_autocmd = function(servers)
+	_create_autocmd = function(servers, config_fn)
 		vim.api.nvim_create_autocmd("BufReadPost", {
 			callback = function(args)
 				vim.defer_fn(function()
-					__maybe_start_lsp(servers, args)
+					__maybe_start_lsp(servers, config_fn, args)
 				end, 2000)
 			end,
 			-- https://github.com/neovim/nvim-lspconfig/blob/0011c435282f043a018e23393cae06ed926c3f4a/lua/lspconfig/configs.lua#L64
