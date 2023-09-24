@@ -1,10 +1,10 @@
+local error = require("chaos.utils").notify_error
+
 local rok, action_state = pcall(require, "telescope.actions.state")
 if not rok then
 	error("telescope required for plugin thing to work")
 	return
 end
-
-local error = require("chaos.utils").notify_error
 
 local function save_colorscheme(colorscheme)
 	if colorscheme == nil then
