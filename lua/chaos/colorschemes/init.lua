@@ -1,10 +1,10 @@
-local error = require("chaos.utils").notify_error
-
-local rok, actions = pcall(require, "telescope.actions")
+local rok, action_state = pcall(require, "telescope.actions.state")
 if not rok then
 	error("telescope required for plugin thing to work")
 	return
 end
+
+local error = require("chaos.utils").notify_error
 
 local function save_colorscheme(colorscheme)
 	if colorscheme == nil then
@@ -31,9 +31,8 @@ local function get_colorscheme()
 	return colorscheme
 end
 
-local action_state = require("telescope.actions.state")
-
-local function save_colorscheme(prompt_bufnr)
+local mod = {}
+function mod.maybe_save_colorscheme(prompt_bufnr)
 	local picker = action_state.get_current_picker(prompt_bufnr)
 	local color = action_state.get_selected_entry().value
 	if picker.prompt_title ~= "Change Colorscheme" then
@@ -46,7 +45,7 @@ end
 local transform_mod = require("telescope.actions.mt").transform_mod
 
 local M = {
-	save_colorscheme = transform_mod({ save_colorscheme = save_colorscheme }).save_colorscheme,
+	maybe_save_colorscheme = transform_mod(mod).maybe_save_colorscheme,
 }
 
 function M.setup_colorscheme()
