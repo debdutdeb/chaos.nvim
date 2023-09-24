@@ -39,7 +39,7 @@ local function save_colorscheme(prompt_bufnr)
 	if picker.prompt_title ~= "Change Colorscheme" then
 		return
 	end
-	coloscheme_handlers.save_colorscheme(color)
+	save_colorscheme(color)
 	-- picker:close_windows() don't close window as select_default is chained
 end
 
