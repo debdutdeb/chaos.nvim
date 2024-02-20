@@ -20,8 +20,9 @@ local function bind(op, outer_opts)
 	---@param rhs Callback | string | function
 	---@param opts table
 	return function(lhs, rhs, opts)
+		local func = rhs
 		if type(rhs) == "table" then
-			rhs = function()
+			func = function()
 				local ok, result = pcall(run, rhs.callback)
 				if not ok or result == Infinity then
 					run(rhs.fallback)
@@ -30,7 +31,7 @@ local function bind(op, outer_opts)
 		end
 
 		opts = vim.tbl_extend("force", outer_opts, opts or {})
-		vim.keymap.set(op, lhs, rhs or function() end, opts)
+		vim.keymap.set(op, lhs, func or function() end, opts)
 	end
 end
 
