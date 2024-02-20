@@ -10,9 +10,9 @@ local function bind(op, outer_opts)
 	---@param foo string|function
 	local run = function(foo)
 		if type(foo) == "string" then
-			vim.api.nvim_command(foo)
+			return vim.api.nvim_command_output(foo)
 		else
-			foo()
+			return foo()
 		end
 	end
 
@@ -24,7 +24,8 @@ local function bind(op, outer_opts)
 		if type(rhs) == "table" then
 			func = function()
 				local ok, result = pcall(run, rhs.callback)
-				if not ok or result == Infinity then
+				if not ok or result == NIL then
+					vim.notify("falling back since primary failed " .. result)
 					run(rhs.fallback)
 				end
 			end

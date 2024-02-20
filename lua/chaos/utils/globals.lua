@@ -1,4 +1,4 @@
-_G.Infinity = setmetatable({}, {
+_G.NIL = setmetatable({}, {
 	__call = function(self, ...) return self end,
 	__index = function(self, _) return self end,
 	__newindex = function(...) end,
@@ -16,7 +16,7 @@ _G.Infinity = setmetatable({}, {
 	__lt = function(self, t) return false end,
 	--XXX
 	__le = function(self, t) if tostring(t) == tostring(self) then return self == t else return false end end,
-	__name = "[[Infinity]]",
+	__name = "[[NIL]]",
 	__len = function(self) return self end,
 	-- TODO: __pairs?
 })
@@ -26,7 +26,7 @@ function _G.Require(mod)
 	local ok, p = pcall(require, mod)
 	if not ok then
 		vim.notify("module not found " .. mod)
-		return Infinity
+		return NIL
 	end
 
 	return p
