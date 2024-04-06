@@ -5,6 +5,8 @@ local utils = require("chaos.utils")
 
 require("chaos.utils.globals")
 
+require("chaos.fun")
+
 function M.setup_commands()
 	vim.api.nvim_create_user_command("GitUrl", function(opts)
 		local _filename = vim.fn.expand("%")
