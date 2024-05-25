@@ -17,14 +17,14 @@ local function bind(op, outer_opts)
 	end
 
 	---@param lhs string
-	---@param rhs Callback | string | function
-	---@param opts table
+	---@param rhs string | function
+	---@param opts table | nil
 	return function(lhs, rhs, opts)
 		local func = rhs
 		if type(rhs) == "table" then
 			func = function()
 				local ok, result = pcall(run, rhs.callback)
-				if not ok or result == NIL then
+				if not ok then
 					vim.notify("falling back since primary failed " .. result)
 					run(rhs.fallback)
 				end

@@ -3,8 +3,6 @@ local M = {}
 local git_handlers = require("chaos.git_handlers")
 local utils = require("chaos.utils")
 
-require("chaos.utils.globals")
-
 require("chaos.fun")
 
 function M.setup_commands()
