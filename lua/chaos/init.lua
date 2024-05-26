@@ -61,10 +61,12 @@ function M.setup_commands()
 			url = url .. "#L" .. opts.line1 .. "-L" .. opts.line2
 		end
 
-		vim.notify(url)
-
-		vim.fn.setreg("+", url)
-	end, { nargs = 0, range = true })
+		if opts.bang then
+			vim.fn.setreg("+", url)
+		else
+			vim.notify(url)
+		end
+	end, { nargs = 0, range = true, bang = true, })
 end
 
 return M
