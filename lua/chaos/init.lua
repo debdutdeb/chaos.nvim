@@ -57,7 +57,9 @@ function M.setup_commands()
 
 		local url = repo_url .. "/blob/" .. hash .. "/" .. filename
 
-		if opts.line2 ~= opts.line1 then
+		if opts.range == 1 then
+			url = url .. "#L" .. opts.count -- or any of opts.line1 or opts.line2
+		elseif opts.range == 2 then
 			url = url .. "#L" .. opts.line1 .. "-L" .. opts.line2
 		end
 
