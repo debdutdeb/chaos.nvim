@@ -57,21 +57,14 @@ function M.setup_commands()
 
 		local url = repo_url .. "/blob/" .. hash .. "/" .. filename
 
-		if vim.api.nvim_get_mode().mode == "n" then
-			vim.notify(url)
-			vim.fn.setreg("+", url)
-			return
+		if opts.line2 ~= opts.line1 then
+			url = url .. "#L" .. opts.line1 .. "-L" .. opts.line2
 		end
-
-		local l1 = vim.api.nvim_buf_get_mark(0, "<")[1]
-		local l2 = vim.api.nvim_buf_get_mark(0, ">")[1]
-
-		url = url .. "#L" .. l1 .. "-L" .. l2
 
 		vim.notify(url)
 
 		vim.fn.setreg("+", url)
-	end, { nargs = 0 })
+	end, { nargs = 0, range = true })
 end
 
 return M
