@@ -60,7 +60,7 @@ function M.setup_commands()
 		if opts.range == 1 then
 			url = url .. "#L" .. opts.count -- or any of opts.line1 or opts.line2
 		elseif opts.range == 2 then
-			url = url .. "#L" .. opts.line1 .. "-L" .. opts.line2
+			url = url .. "#L" .. opts.line1 .. (opts.line1 ~= opts.line2 and ("-L" .. opts.line2) or "")
 		end
 
 		if opts.bang then
@@ -68,7 +68,7 @@ function M.setup_commands()
 		else
 			vim.notify(url)
 		end
-	end, { nargs = 0, range = true, bang = true, })
+	end, { nargs = 0, range = true, bang = true })
 end
 
 return M
