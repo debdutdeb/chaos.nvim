@@ -47,18 +47,32 @@ function M.get_file_relative_path_with_telescope(handler)
 
 	---@param file string
 	local get_relative_path = function(file)
-		local cwd = vim.fn.getcwd() .. Path.path.sep
-
 		local current_file = vim.api.nvim_buf_get_name(vim.api.nvim_get_current_buf())
-		local current_dir = Path:new(current_file):is_dir() and current_file
+		local current_file_dir = Path:new(current_file):is_dir() and current_file
 			or current_file:gsub(Path.path.sep .. "[^" .. Path.path.sep .. "]+$", "")
 
-		local current_dir_relative_to_cwd = Path:new(current_dir):make_relative(cwd)
+		--[[
+		-- If selected file is in the same directory as current file
+		--]]
+		local selected_file_path = Path:new(Path:new(file):absolute())
 
-		local selected_file_relative_to_cwd = Path:new(file):make_relative(cwd)
+		local selected_file_relative_to_cwd = selected_file_path:make_relative(current_file_dir)
+		if not Path:new(selected_file_relative_to_cwd):is_absolute() then
+			return "./" .. tostring(selected_file_relative_to_cwd):gsub(Path.path.sep .. "%." .. Path.path.sep, "")
+		end
 
-		local relative_dir = selected_file_relative_to_cwd
-		for _ in string.gmatch(current_dir_relative_to_cwd, string.format("([^%s]+)", Path.path.sep)) do -- for each part, up one dir
+		--[[
+		-- If selected file isn't in the same directory as currently open file
+		--]]
+		local cwd_with_sep = vim.fn.getcwd() .. Path.path.sep
+
+		-- both are 100% relative to vim_cwd
+		local current_dir_relative_to_vim_cwd = Path:new(current_file_dir):make_relative(cwd_with_sep)
+
+		local selected_file_relative_to_vim_cwd = Path:new(file):make_relative(cwd_with_sep)
+
+		local relative_dir = selected_file_relative_to_vim_cwd
+		for _ in string.gmatch(current_dir_relative_to_vim_cwd, string.format("([^%s]+)", Path.path.sep)) do -- for each part, up one dir
 			relative_dir = Path:new("..") / Path:new(relative_dir)
 		end
 
@@ -68,7 +82,14 @@ function M.get_file_relative_path_with_telescope(handler)
 	pickers
 		.new({}, {
 			prompt_title = "Get relative path of",
-			finder = finders.new_oneshot_job({ "find" }, {}),
+			finder = finders.new_oneshot_job(
+				{
+					vim.iter({ "yes", "true", "1" }):any(function(value)
+						return os.getenv("NEOVIM_CHAOS_USE_FIND") == value
+					end) and "find" or "fd",
+				},
+				{}
+			),
 			previewer = config.file_previewer({}),
 			sorter = config.generic_sorter({}),
 			attach_mappings = function(prompt_bufnr)
